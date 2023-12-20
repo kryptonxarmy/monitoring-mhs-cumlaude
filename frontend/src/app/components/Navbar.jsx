@@ -21,7 +21,9 @@ function Navbar(props) {
           <a href="/Dashboard/Mahasiswa/profile">
             <img src="https://miro.medium.com/v2/resize:fit:845/1*Y4Hje9Txi_eDoBzq_HAiRQ.jpeg" alt="pp" className="rounded-full h-7 bg-cover w-7" />
           </a>
-          <IoIosLogOut className="text-2xl font-extrabold" />
+          <a href="/">
+            <IoIosLogOut className="text-2xl font-extrabold" />
+          </a>
         </div>
       </div>
     </>

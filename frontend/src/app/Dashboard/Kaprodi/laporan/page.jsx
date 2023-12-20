@@ -1,52 +1,30 @@
 "use client";
 
 import React from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Bar } from "react-chartjs-2";
 import { useState, useEffect } from "react";
 import { MdHome } from "react-icons/md";
-import { LuFileInput } from "react-icons/lu";
 import { FaCalendarAlt } from "react-icons/fa";
 import { MdInsertChart } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
 import { PiFileMagnifyingGlassFill } from "react-icons/pi";
-import PieChart from "../../../components/Kaprodi/PieChart";
 import Navbar from "../../../components/Navbar";
+import { useRouter } from "next/navigation";
 
 function DashboardKaprodi() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 1000); // Update setiap detik
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
-
-  // Opsi untuk menampilkan tanggal, bulan, dan tahun
-  const dateFormatOptions = {
-    year: "numeric",
-    month: "short", // atau "short" untuk singkatan bulan
-    day: "numeric",
-  };
-
-  ChartJS.register(ArcElement, Tooltip, Legend);
+  
+  const router = useRouter();
 
   const rows = [
-    { id: 1, nama: "Brice Swyre", nim: "1201234567", date: "2023-01-01", keterangan: "Red", status: "Delivered" },
-    { id: 2, nama: "John Doe", nim: "1201234568", date: "2023-01-02", keterangan: "Blue", status: "Approved by" },
-    { id: 3, nama: "Jane Doe", nim: "1201234569", date: "2023-01-03", keterangan: "Green", status: "Processing" },
-    { id: 4, nama: "Alice Wonderland", nim: "1201234570", date: "2023-01-04", keterangan: "Yellow", status: "Delivered" },
-    { id: 5, nama: "Bob Builder", nim: "1201234571", date: "2023-01-05", keterangan: "Purple", status: "Pending" },
+    { id: 1, nama: "Ilham Satria", nim: "1201234567", date: "2023-01-01", keterangan: "Need Your Approval", status: "Need Approval" },
+    { id: 2, nama: "Ahmad Syahid Danu Wardana", nim: "1201234568", date: "2023-01-02", keterangan: "Need Your Approval", status: "Need Approval" },
+    { id: 3, nama: "Rakha Putra Pebri Yandra", nim: "1201234569", date: "2023-01-03", keterangan: "Second Revision", status: "2nd Revision" },
+    { id: 4, nama: "Alice Wonderland", nim: "1201234570", date: "2023-01-04", keterangan: "Revised", status: "Revised" },
+    { id: 5, nama: "Bob Builder", nim: "1201234571", date: "2023-01-05", keterangan: "-", status: "Approved" },
   ];
 
   return (
     <div className="bg-[#E7ECEF] h-[200vh] flex gap-6" data-theme="light">
       <Navbar />
-
       {/* SIDEBAR */}
       <div className="w-[23vw] relative z-10 flex flex-col gap-3 border-black py-[7em] h-screen">
         <a href="/Dashboard/Kaprodi/main" className="w-full flex hover:cursor-pointer items-center ps-8 gap-2 bg-[#fff] text-[#001247] py-3 rounded-r-xl">
@@ -120,7 +98,7 @@ function DashboardKaprodi() {
                         <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">{row.status}</div>
                       </td>
                       <td>
-                      <PiFileMagnifyingGlassFill className="mx-auto text-[#001247] text-2xl" />
+                      <PiFileMagnifyingGlassFill onClick={() => router.push(`/Dashboard/Kaprodi/laporan/${row.id}/${row.nama}/${row.nim}`)} className="mx-auto cursor-pointer text-[#001247] text-2xl" />
                       </td>
                     </tr>
                  ))

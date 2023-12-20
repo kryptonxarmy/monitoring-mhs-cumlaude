@@ -6,6 +6,7 @@ function Timeline() {
     { date: "8 November 2021", title: "Set Jadwal Sidang", description: "79 Orang belum melakukan sidang", status: "sudah" },
     { date: "8 November 2021", title: "Set Jadwal Sidang", description: "79 Orang belum melakukan sidang", status: "belum" },
     { date: "8 November 2021", title: "Set Jadwal Sidang", description: "79 Orang belum melakukan sidang", status: "sudah" },
+    { date: "8 November 2021", title: "Set Jadwal Sidang", description: "79 Orang belum melakukan sidang", status: "sudah" },
     { date: "8 November 2021", title: "Set Jadwal Sidang", description: "79 Orang belum melakukan sidang", status: "sekarang" },
   ];
 
@@ -13,7 +14,12 @@ function Timeline() {
     <>
       <div className="w-full flex gap-8 flex-wrap">
         {timelineData.map((data, index) => (
-          <div key={index} className={`p-3 h-[12em] w-[12em] ${data.status === "belum" ? "bg-red-400" : data.status === "sekarang" ? "bg-white border-[3px] border-blue-700" : "bg-green-400"} rounded-2xl shadow-xl`}>
+          <div
+            key={index}
+            className={`p-3 h-[12em] w-[12em] ${
+              data.status === "belum" ? "bg-red-400" : data.status === "sekarang" ? "bg-white border-[3px] border-blue-700" : "bg-green-400" 
+            } rounded-2xl shadow-xl`}
+          >
             <h1>{data.date}</h1>
             <br />
             <h1 className="font-bold">{data.title}</h1>
