@@ -3,11 +3,9 @@ const cors = require("cors");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const port = 8080;
-const multer = require('multer')
-const path = require('path');
-const md5 = require('md5')
-
-
+const multer = require("multer");
+const path = require("path");
+const md5 = require("md5");
 
 const app = express();
 app.use(cors());
@@ -40,7 +38,7 @@ app.get("/", (req, res) => {
 
 // app.post("/login", (req, res) => {
 //   const { user_id, password } = req.body;
-//   const sql = `SELECT from users WHERE user_id=${user_id},password=${password}` 
+//   const sql = `SELECT from users WHERE user_id=${user_id},password=${password}`
 //   res.send(sql)
 // });
 
@@ -57,17 +55,16 @@ app.post("/login", (req, res) => {
   });
 });
 
-
 // BERKAS MAHASISWA
 
 // RESTful API endpoint untuk mendapatkan semua berkas
-app.get('/berkasMhs', (req, res) => {
-  const query = 'SELECT * FROM berkas_mhs';
+app.get("/berkasMhs", (req, res) => {
+  const query = "SELECT * FROM berkas_mhs";
 
   connection.query(query, (err, results) => {
     if (err) {
-      console.error('Error getting all berkas: ' + err);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error getting all berkas: " + err);
+      res.status(500).json({ error: "Internal Server Error" });
       return;
     }
 
@@ -75,37 +72,20 @@ app.get('/berkasMhs', (req, res) => {
   });
 });
 
-// RESTful API endpoint untuk membuat berkas baru
-// app.post('/berkasMhs', (req, res) => {
-//   const newBerkas = req.body;
-
-//   const query = 'INSERT INTO berkas_mhs SET ?';
-
-//   connection.query(query, newBerkas, (err, results) => {
-//     if (err) {
-//       console.error('Error creating berkas: ' + err);
-//       res.status(500).json({ error: 'Internal Server Error' });
-//       return;
-//     }
-
-//     res.json({ id: results.insertId });
-//   });
-// });
-
 // RESTful API endpoint untuk mendapatkan berkas berdasarkan ID
-app.get('/berkasMhs/:id', (req, res) => {
+app.get("/berkasMhs/:id", (req, res) => {
   const berkasId = req.params.id;
-  const query = 'SELECT * FROM berkas_mhs WHERE id = ?';
+  const query = "SELECT * FROM berkas_mhs WHERE id = ?";
 
   connection.query(query, [berkasId], (err, results) => {
     if (err) {
-      console.error('Error getting berkas by ID: ' + err);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error getting berkas by ID: " + err);
+      res.status(500).json({ error: "Internal Server Error" });
       return;
     }
 
     if (results.length === 0) {
-      res.status(404).json({ error: 'Berkas not found' });
+      res.status(404).json({ error: "Berkas not found" });
       return;
     }
 
@@ -114,44 +94,58 @@ app.get('/berkasMhs/:id', (req, res) => {
 });
 
 // RESTful API endpoint untuk memperbarui berkas berdasarkan ID
-app.put('/berkasMhs/:id', (req, res) => {
+app.put("/berkasMhs/:id", (req, res) => {
   const berkasId = req.params.id;
   const updatedData = req.body;
 
-  const query = 'UPDATE berkas_mhs SET ? WHERE id = ?';
+  const query = "UPDATE berkas_mhs SET ? WHERE id = ?";
 
   connection.query(query, [updatedData, berkasId], (err) => {
     if (err) {
-      console.error('Error updating berkas: ' + err);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error("Error updating berkas: " + err);
+      res.status(500).json({ error: "Internal Server Error" });
       return;
     }
 
-    res.json({ message: 'Berkas updated successfully' });
+    res.json({ message: "Berkas updated successfully" });
   });
 });
 
 // RESTful API endpoint untuk menghapus berkas berdasarkan ID
-app.delete('/berkasMhs/:id', (req, res) => {
-  const berkasId = req.params.id;
-  const query = 'DELETE FROM berkas_mhs WHERE id = ?';
 
-  connection.query(query, [berkasId], (err) => {
+// -------------------------- DELETE START -------------------------------------
+app.delete("/berkasMhs/:id", async (req, res) => {
+  const fileId = req.params.id;
 
-    if (err) {
-      console.error('Error deleting berkas: ' + err);
-      res.status(500).json({ error: 'Internal Server Error' });
-      return;
-    }
+  try {
+    // Perform the deletion operation in your database
+    // Example: Delete from berkas_mhs where id = fileId
 
-    res.json({ message: 'Berkas deleted successfully' });
-  });
+    // Assuming you are using a MySQL database
+    const sql = "DELETE FROM berkas_mhs WHERE id = ?";
+    connection.query(sql, [fileId], (err, result) => {
+      if (err) {
+        console.error(err.message);
+        return res.status(500).json({ msg: "Internal Server Error" });
+      }
+
+      if (result.affectedRows > 0) {
+        res.status(200).json({ msg: "File Deleted Successfully" });
+      } else {
+        res.status(404).json({ msg: "File not found" });
+      }
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
 });
 
+// -------------------------- DELETE END -------------------------------------
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads');
+    cb(null, "uploads");
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -163,25 +157,24 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Endpoint for file upload
-app.post('/berkasMhs', upload.single('file'), async (req, res) => {
+app.post("/berkasMhs", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).send('No file was uploaded.');
+      return res.status(400).send("No file was uploaded.");
     }
-
     const keterangan = req.body.keterangan;
-    const keperluan = req.body.keperluan;
-    const status = req.body.status;
+    const nim = req.body.nim;
+    const score = req.body.score || null;
+    const judulJurnal = req.body.judul_jurnal || null;
+    const tingkat = req.body.tingkat || null;
+    const status = "Delivered";
     const nama_berkas = req.body.nama_berkas;
 
     const fileName = req.file.filename;
     const url = `${req.protocol}://${req.get("host")}/uploads/${fileName}`;
-    
-    // Your validation logic for file type and size goes here
-
     try {
-      const sql = 'INSERT INTO berkas_mhs (nama_berkas, nim, keterangan, status, file_berkas) VALUES (?, ?, ?, ?, ?)';
-      const values = [nama_berkas, nim, keterangan,  "Delivered" , url];
+      const sql = "INSERT INTO berkas_mhs (nama_berkas, nim, keterangan, status, file_berkas, score, judul_jurnal, tingkat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+      const values = [nama_berkas, nim, keterangan, status, url, score, judulJurnal, tingkat];
 
       connection.query(sql, values, (err, result) => {
         if (err) {
@@ -204,9 +197,5 @@ app.post('/berkasMhs', upload.single('file'), async (req, res) => {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 });
-  
-
-      
 
 // BERKAS MAHASISWA
-

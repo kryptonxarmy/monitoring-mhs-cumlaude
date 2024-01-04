@@ -16,6 +16,12 @@ function InputFileMahasiswa() {
   const [berkas, setBerkas] = useState(null);
   const [dataList, setDataList] = useState([]);
   const [namaBerkas, setNamaBerkas] = useState("");
+  const [selectedFileId, setSelectedFileId] = useState(null);
+  const [score, setScore] = useState("");
+  const [judulJurnal, setJudulJurnal] = useState("");
+  const [tingkat, setTingkat] = useState("");
+
+  const nim = localStorage.getItem('nim');
 
   const loadImage = (e) => {
     e.preventDefault();
@@ -29,10 +35,13 @@ function InputFileMahasiswa() {
     console.log("clicked");
     const formData = new FormData();
     formData.append("file", berkas);
+    formData.append("nim", nim);
     formData.append("nama_berkas", namaBerkas);
-    formData.append("keperluan", keperluan);
+    formData.append("score", score); 
+    formData.append("judul_jurnal", judulJurnal);
+    formData.append("tingkat", tingkat); 
     formData.append("keterangan", keterangan);
-  
+
     try {
       await axios.post("http://localhost:8080/berkasMhs", formData, {
         headers: {
@@ -41,7 +50,7 @@ function InputFileMahasiswa() {
       });
       console.log(formData);
       alert("File Berhasil Diupload !");
-      window.location.href = "/Dashboard/Mahasiswa/inputfile"
+      window.location.href = "/Dashboard/Mahasiswa/inputfile";
     } catch (error) {
       console.error("Error uploading file:", error.message);
     }
@@ -58,7 +67,7 @@ function InputFileMahasiswa() {
             <MdHome className="text-xl" />
             <h1 className="font-bold text-xl">Dashboard</h1>
           </a>
-          <a href="dashboardmahasiswa/inputfile" className="w-full flex hover:cursor-pointer justify-center items-center gap-2 bg-[#001247] text-white py-2 rounded-r-xl">
+          <a href="/Dashboard/Mahasiswa/inputfile" className="w-full flex hover:cursor-pointer justify-center items-center gap-2 bg-[#001247] text-white py-2 rounded-r-xl">
             <LuFileInput className="text-xl" />
             <h1 className="font-bold text-xl">Input File</h1>
           </a>
@@ -73,7 +82,7 @@ function InputFileMahasiswa() {
               <div className="w-full h-[3px] bg-gray-600"></div>
               <div className="flex gap-3 items-center mt-8">
                 <form className="flex flex-col gap-3 w-full">
-                  <div className="flex gap-3 items-center">
+                  <div className="flex gap-[1.6em] items-center">
                     <h1 className="font-bold">Nama Berkas</h1>
                     <select value={namaBerkas} onChange={(e) => setNamaBerkas(e.target.value)} name="nama_berkas" className="file-input file-input-bordered w-full h-[2em]">
                       <option value="TAK">TAK</option>
@@ -84,8 +93,38 @@ function InputFileMahasiswa() {
                     </select>
                   </div>
                   <div className="flex gap-9 items-center">
-                    <h1 className="font-bold">Keperluan</h1>
-                    <input type="text" value={keperluan} onChange={(e) => setKeperluan(e.target.value)} name="nama_berkas" className="file-input file-input-bordered w-full h-[2em]" />
+                    {namaBerkas === "EPrT" && (
+                      <>
+                        <h1 className="font-bold">Score</h1>
+                        <input type="text" value={score} onChange={(e) => setScore(e.target.value)} name="score" className="file-input file-input-bordered w-full h-[2em]" />
+                      </>
+                    )}
+                    {namaBerkas === "TAK" && (
+                      <>
+                        <h1 className="font-bold">Score</h1>
+                        <input type="text" value={score} onChange={(e) => setScore(e.target.value)} name="score" className="file-input file-input-bordered w-full h-[2em]" />
+                      </>
+                    )}
+                    {namaBerkas === "Jurnal" && (
+                      <>
+                        <h1 className="font-bold">Judul Jurnal</h1>
+                        <input type="text" value={judulJurnal} onChange={(e) => setJudulJurnal(e.target.value)} name="judulJurnal" className="file-input file-input-bordered w-full h-[2em]" />
+                      </>
+                    )}
+                    {namaBerkas === "Bimbingan" && (
+                      <>
+                        <h1 className="font-bold">Jumlah Bimbingan</h1>
+                        <input type="text" value={score} onChange={(e) => setScore(e.target.value)} name="score" className="file-input file-input-bordered w-full h-[2em]" />
+                      </>
+                    )}
+                    {namaBerkas === "Sertifikat Lomba" && (
+                      <>
+                        <h1 className="font-bold">Peringkat</h1>
+                        <input type="text" value={score} onChange={(e) => setScore(e.target.value)} name="score" className="file-input file-input-bordered w-full h-[2em]" />
+                        <h1 className="font-bold">Tingkat</h1>
+                        <input type="text" value={tingkat} onChange={(e) => setTingkat(e.target.value)} name="tingkat" className="file-input file-input-bordered w-full h-[2em]" />
+                      </>
+                    )}
                   </div>
                   <div className="flex gap-6 items-center">
                     <h1 className="font-bold">Keterangan</h1>

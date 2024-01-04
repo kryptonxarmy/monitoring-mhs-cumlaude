@@ -13,48 +13,46 @@ function InputFileMahasiswa() {
   const [berkas, setBerkas] = useState(null);
   const [dataList, setDataList] = useState([]);
   const [namaBerkas, setNamaBerkas] = useState("");
+  
 
-  const nim = localStorage.getItem('nim');
+const nim = localStorage.getItem("nim");
+
+// ----------------------------  METHOD BUAT GET DATA ----------------------------
+const getData = async () => {
+  try {
+    const res = await axios.get('http://localhost:8080/berkasMhs');
+    setDataList(res.data);
+
+    res.data.forEach((item) => {
+      const dateObject = new Date(item.updated_at);
+      const formattedDate = formatDate(dateObject);
+      console.log(formattedDate);
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+  // ----------------------------  METHOD BUAT GET DATA ----------------------------
+
+  // ----------------------------  METHOD BUAT DELETE DATA ----------------------------
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8080/berkasMhs/${id}`);
+      alert("File Berhasil Dihapus!");
+      // Refresh data after deletion
+      getData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // ----------------------------  METHOD BUAT DELETE DATA END ----------------------------
 
   const loadImage = (e) => {
     e.preventDefault();
     const image = e.target.files[0];
     setBerkas(image);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("file", berkas);
-    formData.append("nama_berkas", namaBerkas);
-    formData.append("nim", nim);
-    formData.append("keterangan", keterangan);
-    try {
-      await axios.post("http://localhost:8080/berkasMhs", formData, {
-        headers: {
-          "Content-type": "multipart/form-data",
-        },
-      });
-      alert("File Berhasil Diupload!");
-      addBerkasRef.current = false;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const res = await axios.get("http://localhost:8080/berkasMhs");
-      setDataList(res.data);
-
-      res.data.forEach((item) => {
-        const dateObject = new Date(item.updated_at);
-        const formattedDate = formatDate(dateObject);
-        console.log(formattedDate);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
   };
 
   const formatDate = (date) => {
@@ -143,17 +141,11 @@ function InputFileMahasiswa() {
         {/* {addBerkasRef.current && <PopUpInputBerkas />} */}
 
         <div className="w-[23vw] relative z-10 flex flex-col gap-3 border-black py-[7em] h-screen">
-          <a
-            href="/Dashboard/Mahasiswa/main"
-            className="w-full flex hover:cursor-pointer justify-center items-center gap-2 bg-[#fff] text-black py-3 rounded-r-xl"
-          >
+          <a href="/Dashboard/Mahasiswa/main" className="w-full flex hover:cursor-pointer justify-center items-center gap-2 bg-[#fff] text-black py-3 rounded-r-xl">
             <MdHome className="text-xl" />
             <h1 className="font-bold text-xl">Dashboard</h1>
           </a>
-          <a
-            href="dashboardmahasiswa/inputfile"
-            className="w-full flex hover:cursor-pointer justify-center items-center gap-2 bg-[#001247] text-white py-2 rounded-r-xl"
-          >
+          <a href="dashboardmahasiswa/inputfile" className="w-full flex hover:cursor-pointer justify-center items-center gap-2 bg-[#001247] text-white py-2 rounded-r-xl">
             <LuFileInput className="text-xl" />
             <h1 className="font-bold text-xl">Input File</h1>
           </a>
@@ -161,10 +153,7 @@ function InputFileMahasiswa() {
 
         <div className="pt-[7em] w-[70%]">
           <div className="w-full flex justify-end mb-4">
-            <a
-              className="btn bg-green-400 hover:bg-green-500"
-              href="/Dashboard/Mahasiswa/unggah"
-            >
+            <a className="btn bg-green-400 hover:bg-green-500" href="/Dashboard/Mahasiswa/unggah">
               Tambah Berkas
             </a>
           </div>
@@ -183,23 +172,22 @@ function InputFileMahasiswa() {
                 </tr>
               </thead>
               <tbody>
-                {dataList.map((data, index) => (
+                {dataList
+                .filter((data) => data.nim.toString() === nim.toString())
+                .map((data, index) => (
                   <tr className="text-center" key={data.id}>
                     <th>{index + 1}</th>
                     <td>{data.nama_berkas}</td>
-                    {/* <td>Input TAK</td> */}
                     <td>{formatDate(new Date(data.updated_at))}</td>
                     <td className="max-w-xs">{data.keterangan}</td>
                     <td>
-                      <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">
-                        {data.status}
-                      </div>
+                      <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">{data.status}</div>
                     </td>
                     <td>
-                      <button className="text-[#624DE3] mx-2 text-xl">
+                      {/* <button className="text-[#624DE3] mx-2 text-xl">
                         <FaEdit />
-                      </button>
-                      <button className="text-[#A30D11] mx-2 text-xl">
+                      </button> */}
+                      <button onClick={() => handleDelete(data.id)} className="text-[#A30D11] mx-2 text-xl">
                         <FaRegTrashAlt />
                       </button>
                     </td>
