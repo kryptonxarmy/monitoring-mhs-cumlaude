@@ -11,6 +11,7 @@ import Timeline from "../../../components/Mahasiswa/Timeline";
 import Doughnut from "../../../components/Mahasiswa/Doughnut";
 
 function DashboardMahasiswa(props) {
+  const name = localStorage.getItem('name')
   const [currentDate, setCurrentDate] = useState(new Date());
 
   ChartJS.register(ArcElement, Tooltip, Legend);
@@ -52,7 +53,7 @@ function DashboardMahasiswa(props) {
       <div className="w-[70%] pt-[7em] flex flex-col gap-4">
         <div className="flex w-full justify-between">
           <div className="h-10">
-            <h1 className="font-bold text-black">Hi! Ahmad Syahid Danu Wardana</h1>
+            <h1 className="font-bold text-black">Hi! {name}</h1>
             <p className="text-lg text-black">Welcome Back!</p>
           </div>
           <div className="flex bg-white rounded-lg gap-2 h-10 items-center p-3">

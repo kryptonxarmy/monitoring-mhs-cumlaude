@@ -117,7 +117,21 @@ function DashboardKaprodi({ params }) {
                     <td>{row.date}</td>
                     <td>{row.keterangan}</td>
                     <td>
-                      <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">{row.status}</div>
+                      {row.status == "Need Approval" ? (
+                        <details className="dropdown">
+                          <summary className="bg-[#EBEE3F] text-[#675F12] px-3 py-1 rounded-xl">{row.status}</summary>
+                          <ul className="shadow menu dropdown-content z-[1] bg-[#EBEE3F] rounded-xl">
+                            <li>
+                              <a>Approved by Doswal</a>
+                            </li>
+                            <li>
+                              <a>Approved by Dosbing</a>
+                            </li>
+                          </ul>
+                        </details>
+                      ) : (
+                        <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">{row.status}</div>
+                      )}
                     </td>
                     <td>
                       <PiFileMagnifyingGlassFill onClick={() => setIsPopup(true)} className="mx-auto cursor-pointer text-[#001247] text-2xl" />
