@@ -9,10 +9,44 @@ import { FaFileAlt } from "react-icons/fa";
 import { PiFileMagnifyingGlassFill } from "react-icons/pi";
 import Navbar from "../../../components/Navbar";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 function DashboardKaprodi() {
-  
+  const [dataList, setDataList] = useState([]);
+
   const router = useRouter();
+
+  // ----------------------------  METHOD BUAT GET DATA ----------------------------
+  const getData = async () => {
+    console.log("fetching data....");
+    try {
+      const res = await axios.get("http://localhost:8080/berkasKaprodi");
+      // Destructuring response.data untuk mengambil data langsung
+      setDataList(res.data);
+      console.log(res.data);
+
+      data.forEach((item) => {
+        const dateObject = new Date(item.updated_at);
+        const formattedDate = formatDate(dateObject);
+        console.log(formattedDate);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+      console.log(error.message);
+      // Handle error, misalnya menampilkan pesan kesalahan kepada pengguna
+    }
+  };
+
+  // ----------------------------  METHOD BUAT GET DATA ----------------------------
+
+  const formatDate = (date) => {
+    const options = { year: "numeric", month: "numeric", day: "numeric" };
+    return date.toLocaleDateString("id-ID", options);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   const rows = [
     { id: 1, nama: "Ilham Satria", nim: "1201234567", date: "2023-01-01", keterangan: "Need Your Approval", status: "Need Approval" },
@@ -81,36 +115,39 @@ function DashboardKaprodi() {
                 <th>Nama Mahasiswa</th>
                 <th>NIM</th>
                 <th>Date</th>
-                <th>Keterangan</th>
+                <th>Nama Berkas</th>
                 <th>Status</th>
                 <th className="text-center">Action</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((row)=>(
-                    <tr key={row.id} className="text-center">
-                      <th>{row.id}</th>
-                      <td>{row.nama}</td>
-                      <td>{row.nim}</td>
-                      <td>{row.date}</td>
-                      <td>{row.keterangan}</td>
-                      <td>
-                        <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">{row.status}</div>
-                      </td>
-                      <td>
-                      <PiFileMagnifyingGlassFill onClick={() => router.push(`/Dashboard/Kaprodi/laporan/${row.id}/${row.nama}/${row.nim}`)} className="mx-auto cursor-pointer text-[#001247] text-2xl" />
-                      </td>
-                    </tr>
-                 ))
-                 }
+              {dataList.map((data, index) => (
+                <tr key={data.id} className="text-center">
+                  <th>{index + 1}</th>
+                  <td>{data.user_name}</td>
+                  <td>{data.nim}</td>
+                  <td>{formatDate(new Date(data.updated_at))}</td>
+                  <td>{data.nama_berkas}</td>
+                  <td>
+                    <div
+                      className={`px-3 py-1 rounded-xl ${
+                        data.status === "Delivered" ? "bg-yellow-300 text-black" : data.status === "Rejected" ? "bg-red-300 text-white" : data.status === "Approved" || "approved" ? "bg-green-300 text-green-900" : ""
+                      }`}
+                    >
+                      {data.status === "Delivered" ? "Need Approval" : data.status}
+                    </div>
+                  </td>
+                  <td>
+                    <PiFileMagnifyingGlassFill onClick={() => router.push(`/Dashboard/Kaprodi/laporan/${data.id}/${data.user_name}/${data.nim}`)} className="mx-auto cursor-pointer text-[#001247] text-2xl" />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
         {/* TABLE */}
       </div>
       {/* CENTER */}
-
-    
     </div>
   );
 }

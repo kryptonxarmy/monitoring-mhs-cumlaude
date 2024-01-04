@@ -29,7 +29,7 @@ const DoughnutChart = (props) => {
           }
         }}
       />
-      <h1 className="font-bold text-4xl relative -top-[6em] ml-[2.8em]">{props.m}%</h1>
+      <h1 className="font-bold text-4xl relative -top-[5.8em] ml-[2.8em]">{props.m}%</h1>
     </div>
   );
 };

@@ -96,11 +96,11 @@ app.get("/berkasMhs/:id", (req, res) => {
 // RESTful API endpoint untuk memperbarui berkas berdasarkan ID
 app.put("/berkasMhs/:id", (req, res) => {
   const berkasId = req.params.id;
-  const updatedData = req.body;
+  const newStatus = req.body.status; // Ambil status baru dari req.body
 
-  const query = "UPDATE berkas_mhs SET ? WHERE id = ?";
+  const query = "UPDATE berkas_mhs SET status = ? WHERE id = ?";
 
-  connection.query(query, [updatedData, berkasId], (err) => {
+  connection.query(query, [newStatus, berkasId], (err) => {
     if (err) {
       console.error("Error updating berkas: " + err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -197,5 +197,78 @@ app.post("/berkasMhs", upload.single("file"), async (req, res) => {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 });
+
+// ----------------- UNTUK GET METHOD DARI KAPRODI ------------------
+app.get("/berkasKaprodi", (req, res) => {
+  const query = `
+  SELECT bm.*, u.name AS user_name
+  FROM berkas_mhs bm
+  INNER JOIN users u ON bm.nim = u.user_id  
+  `;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error getting all berkas: " + err);
+      res.status(500).json({ error: "Internal Server Error" });
+      return;
+    }
+    res.json(results);
+  });
+});
+// ----------------- UNTUK GET METHOD DARI KAPRODI ------------------
+
+// ----------------- UNTUK GET METHOD DARI KAPRODI ------------------
+app.post("/getInfoMhs", (req, res) => {
+  const nim = req.body.nim;
+  if (!nim) {
+    return res.status(400).json({ error: "NIM is required in the request body." });
+  }
+
+  const query = `
+    SELECT users.name, berkas_mhs.*
+    FROM berkas_mhs
+    JOIN users ON berkas_mhs.nim = users.user_id
+    WHERE berkas_mhs.nim = '${nim}'
+      AND berkas_mhs.nama_berkas IN ('TAK', 'EPrT', 'Jurnal', 'Bimbingan')
+      AND berkas_mhs.status = 'Approved'
+    ORDER BY berkas_mhs.updated_at DESC;
+  `;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error getting berkas info: " + err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    res.json(results);
+  });
+});
+
+app.get("/getApprovalStatus", (req, res) => {
+  const nim = req.query.nim;
+
+  const query = `
+    SELECT nama_berkas, status
+    FROM berkas_mhs
+    WHERE nim = '${nim}'
+      AND nama_berkas IN ('TAK', 'EPrT', 'Jurnal');
+  `;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error getting approval status: " + err);
+      res.status(500).json({ error: "Internal Server Error" });
+      return;
+    }
+
+    const approvalStatus = {};
+    results.forEach((result) => {
+      approvalStatus[result.nama_berkas] = result.status;
+    });
+
+    res.json(approvalStatus);
+  });
+});
+// ----------------- UNTUK GET METHOD DARI KAPRODI ------------------
 
 // BERKAS MAHASISWA

@@ -21,6 +21,7 @@ function LoginPage() {
         localStorage.setItem('nim', res.data.user_id)
         window.location.href = "Dashboard/Mahasiswa/main"
       }else if(res.data.role === 'kaprodi'){
+        localStorage.setItem('name', res.data.name)
         window.location.href = "Dashboard/Kaprodi/main"
       }
       console.log(res.data.role)

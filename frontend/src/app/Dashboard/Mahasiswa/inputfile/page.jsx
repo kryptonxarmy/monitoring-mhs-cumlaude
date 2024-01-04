@@ -13,25 +13,24 @@ function InputFileMahasiswa() {
   const [berkas, setBerkas] = useState(null);
   const [dataList, setDataList] = useState([]);
   const [namaBerkas, setNamaBerkas] = useState("");
-  
 
-const nim = localStorage.getItem("nim");
+  const nim = localStorage.getItem("nim");
 
-// ----------------------------  METHOD BUAT GET DATA ----------------------------
-const getData = async () => {
-  try {
-    const res = await axios.get('http://localhost:8080/berkasMhs');
-    setDataList(res.data);
+  // ----------------------------  METHOD BUAT GET DATA ----------------------------
+  const getData = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/berkasMhs");
+      setDataList(res.data);
 
-    res.data.forEach((item) => {
-      const dateObject = new Date(item.updated_at);
-      const formattedDate = formatDate(dateObject);
-      console.log(formattedDate);
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
+      res.data.forEach((item) => {
+        const dateObject = new Date(item.updated_at);
+        const formattedDate = formatDate(dateObject);
+        console.log(formattedDate);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   // ----------------------------  METHOD BUAT GET DATA ----------------------------
 
@@ -173,26 +172,32 @@ const getData = async () => {
               </thead>
               <tbody>
                 {dataList
-                .filter((data) => data.nim.toString() === nim.toString())
-                .map((data, index) => (
-                  <tr className="text-center" key={data.id}>
-                    <th>{index + 1}</th>
-                    <td>{data.nama_berkas}</td>
-                    <td>{formatDate(new Date(data.updated_at))}</td>
-                    <td className="max-w-xs">{data.keterangan}</td>
-                    <td>
-                      <div className="bg-[#EBF9F1] text-[#1F9254] px-3 py-1 rounded-xl">{data.status}</div>
-                    </td>
-                    <td>
-                      {/* <button className="text-[#624DE3] mx-2 text-xl">
+                  .filter((data) => data.nim.toString() === nim.toString())
+                  .map((data, index) => (
+                    <tr className="text-center" key={data.id}>
+                      <th>{index + 1}</th>
+                      <td>{data.nama_berkas}</td>
+                      <td>{formatDate(new Date(data.updated_at))}</td>
+                      <td className="max-w-xs">{data.keterangan}</td>
+                      <td>
+                        <div
+                          className={`px-3 py-1 rounded-xl ${
+                            data.status === "Delivered" ? "bg-yellow-300 text-black" : data.status === "Rejected" ? "bg-red-400 text-red-900" : data.status === "Approved" || "approved" ? "bg-green-400 text-green-900" : ""
+                          }`}
+                        >
+                          {data.status === "Delivered" ? "Submitted" : data.status}
+                        </div>
+                      </td>
+                      <td>
+                        {/* <button className="text-[#624DE3] mx-2 text-xl">
                         <FaEdit />
                       </button> */}
-                      <button onClick={() => handleDelete(data.id)} className="text-[#A30D11] mx-2 text-xl">
-                        <FaRegTrashAlt />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <button onClick={() => handleDelete(data.id)} className="text-[#A30D11] mx-2 text-xl">
+                          <FaRegTrashAlt />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
