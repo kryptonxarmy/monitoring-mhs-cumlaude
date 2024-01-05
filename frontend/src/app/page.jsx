@@ -10,7 +10,7 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const res = await axios.post("http://localhost:8081/login", {
+    const res = await axios.post("http://localhost:8080/login", {
       user_id: userID,
       password: password,
     });

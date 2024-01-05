@@ -42,7 +42,7 @@ function DashboardMahasiswa(props) {
   const getApprovalStatus = async () => {
     try {
       const nim = localStorage.getItem("nim");
-      const response = await axios.get(`http://localhost:8081/getApprovalStatus?nim=${nim}`);
+      const response = await axios.get(`http://localhost:8080/getApprovalStatus?nim=${nim}`);
       setApprovalStatus(response.data);
       console.log(response.data);
 

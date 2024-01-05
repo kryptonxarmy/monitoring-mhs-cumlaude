@@ -43,7 +43,7 @@ function InputFileMahasiswa() {
     formData.append("keterangan", keterangan);
 
     try {
-      await axios.post("http://localhost:8081/berkasMhs", formData, {
+      await axios.post("http://localhost:8080/berkasMhs", formData, {
         headers: {
           "Content-type": "multipart/form-data",
         },
