@@ -19,7 +19,7 @@ function InputFileMahasiswa() {
   // ----------------------------  METHOD BUAT GET DATA ----------------------------
   const getData = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/berkasMhs");
+      const res = await axios.get("http://localhost:8081/berkasMhs");
       setDataList(res.data);
 
       res.data.forEach((item) => {
@@ -38,7 +38,7 @@ function InputFileMahasiswa() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/berkasMhs/${id}`);
+      await axios.delete(`http://localhost:8081/berkasMhs/${id}`);
       alert("File Berhasil Dihapus!");
       // Refresh data after deletion
       getData();

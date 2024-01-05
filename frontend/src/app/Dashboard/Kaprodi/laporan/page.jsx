@@ -20,7 +20,7 @@ function DashboardKaprodi() {
   const getData = async () => {
     console.log("fetching data....");
     try {
-      const res = await axios.get("http://localhost:8080/berkasKaprodi");
+      const res = await axios.get("http://localhost:8081/berkasKaprodi");
       // Destructuring response.data untuk mengambil data langsung
       setDataList(res.data);
       console.log(res.data);

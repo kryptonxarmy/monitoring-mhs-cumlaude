@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
-const port = 8080;
+const port = 8081;
 const multer = require("multer");
 const path = require("path");
 const md5 = require("md5");
@@ -98,19 +98,41 @@ app.put("/berkasMhs/:id", (req, res) => {
   const berkasId = req.params.id;
   const newStatus = req.body.status; // Ambil status baru dari req.body
 
-  const query = "UPDATE berkas_mhs SET status = ? WHERE id = ?";
+  // Simpan NIM sebelum pembaruan
+  let currentNIM;
 
-  connection.query(query, [newStatus, berkasId], (err) => {
+  // Ambil NIM sebelum pembaruan
+  const getNIMQuery = "SELECT nim FROM berkas_mhs WHERE id = ?";
+
+  connection.query(getNIMQuery, [berkasId], (err, results) => {
     if (err) {
-      console.error("Error updating berkas: " + err);
+      console.error("Error getting NIM before update: " + err);
       res.status(500).json({ error: "Internal Server Error" });
       return;
     }
 
-    res.json({ message: "Berkas updated successfully" });
+    if (results.length === 0) {
+      res.status(404).json({ error: "Berkas not found" });
+      return;
+    }
+
+    currentNIM = results[0].nim;
+
+    // Lakukan pembaruan status
+    const updateQuery = "UPDATE berkas_mhs SET status = ? WHERE id = ?";
+
+    connection.query(updateQuery, [newStatus, berkasId], (updateErr) => {
+      if (updateErr) {
+        console.error("Error updating berkas: " + updateErr);
+        res.status(500).json({ error: "Internal Server Error" });
+        return;
+      }
+
+      // Panggil endpoint /jadwalSidang dengan NIM yang sudah diperoleh
+      res.redirect(`/jadwalSidang?nim=${currentNIM}`);
+    });
   });
 });
-
 // RESTful API endpoint untuk menghapus berkas berdasarkan ID
 
 // -------------------------- DELETE START -------------------------------------
@@ -269,6 +291,53 @@ app.get("/getApprovalStatus", (req, res) => {
     res.json(approvalStatus);
   });
 });
+
+app.get("/jadwalSidang", (req, res) => {
+  const nim = req.query.nim;
+
+  // Query untuk mengambil data TAK, EPrT, dan Jurnal yang sudah Approved berdasarkan nim
+  const query = `
+    SELECT berkas_mhs.nim, users.name
+    FROM berkas_mhs
+    JOIN users ON berkas_mhs.nim = users.user_id
+    WHERE berkas_mhs.nim = '${nim}' AND berkas_mhs.status = 'Approved'
+      AND berkas_mhs.nama_berkas IN ('TAK', 'EPrT', 'Jurnal');
+  `;
+
+  // Eksekusi query
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error getting approved data: " + err);
+      res.status(500).json({ error: "Internal Server Error" });
+      return;
+    }
+
+    if (results.length !== 3) {
+      // Jika tidak ada data yang memenuhi kriteria atau belum semuanya di-approved
+      res.status(404).json({ error: "Not all required documents are approved for the specified NIM" });
+      return;
+    }
+
+    // Jika ada data yang memenuhi kriteria, masukkan ke dalam tabel sidang
+    const insertQuery = `
+      INSERT INTO sidang (nama_mhs, nim, date, periode, status)
+      VALUES ('${results[0].name}', '${results[0].nim}', NOW(), 'semester_ini', 'Approved');
+    `;
+
+    // Eksekusi query untuk insert ke tabel sidang
+    connection.query(insertQuery, (insertErr, insertResults) => {
+      if (insertErr) {
+        console.error("Error inserting data into sidang: " + insertErr);
+        res.status(500).json({ error: "Internal Server Error" });
+        return;
+      }
+
+      // Berhasil memasukkan data ke dalam tabel sidang
+      res.json({ message: "Data successfully inserted into sidang" });
+    });
+  });
+});
+
 // ----------------- UNTUK GET METHOD DARI KAPRODI ------------------
 
 // BERKAS MAHASISWA

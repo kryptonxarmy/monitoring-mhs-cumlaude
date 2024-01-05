@@ -16,7 +16,7 @@ function DashboardKaprodi({ params }) {
 
   const getData = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/berkasMhs");
+      const res = await axios.get("http://localhost:8081/berkasMhs");
       setDataList(res.data);
 
       res.data.forEach((item) => {
@@ -37,7 +37,7 @@ function DashboardKaprodi({ params }) {
   const handleApproval = async (answer) => {
     try {
       if (selectedBerkasId) {
-        const response = await axios.put(`http://localhost:8080/berkasMhs/${selectedBerkasId}`, { status: `${answer}` });
+        const response = await axios.put(`http://localhost:8081/berkasMhs/${selectedBerkasId}`, { status: `${answer}` });
         console.log(response.data);
         window.location.reload();
       } else {
